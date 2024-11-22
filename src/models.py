@@ -22,9 +22,9 @@ class User(db.Model):
 
     def serialize(self):
         return {
-            "id": self.id,
-            "name": self.name,
-            "email": self.email,
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
         }
 
 class Character(db.Model):

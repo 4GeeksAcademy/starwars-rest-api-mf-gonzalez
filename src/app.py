@@ -58,6 +58,7 @@ def create_user():
     db.session.add(user)
     db.session.commit()
     return jsonify(user.serialize()), 200
+
     
 
 @app.route('/character', methods=['GET'])
