@@ -25,18 +25,17 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 
-# Handle/serialize errors like a JSON object
+
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
-# generate sitemap with all your endpoints
+
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
 
 
-#GET Users
 @app.route('/user', methods=['GET'])
 def info_user():
 
@@ -46,31 +45,21 @@ def info_user():
     return jsonify(response), 200
 
 
-# CREATE User
 @app.route('/user', methods=['POST'])
-def add_user():
-    body = request.json
-
-    name = body.get('name', None)
-    last_name = body.get('last_name', None)
-    email = body.get('email',None)
-    password = body.get('password', None)
-
-    if name == None or last_name == None or email == None or password == None:
-        return jsonify({"mg" : "Incompleto"}), 400
-
-    try:
-
-        new_user = User(name=name, last_name=last_name, email=email, password=password)
-        db.session.add(new_user) 
-        db.session.commit()
-        
-        return jsonify({"msg" : "Creado"}), 201
-
-    except:
-        return jsonify ({"Error" : "Incompleto"}), 500
+def create_user():
+    request_body = request.get_json()
+    user = User(
+        username=request_body["username"], 
+        email=request_body["email"], 
+        password=request_body["password"], 
+        suscription_date=request_body["suscription_date"]        
+        )
     
-# GET PEOPLE / CHARACTER
+    db.session.add(user)
+    db.session.commit()
+    return jsonify(user.serialize()), 200
+    
+
 @app.route('/character', methods=['GET'])
 def info_character():
 
@@ -79,8 +68,6 @@ def info_character():
 
     return jsonify(response), 200
     
-
-#GET ID CHARACTER
 
 @app.route('/character/<int:id>', methods=['GET'])
 def id_character(id):
@@ -92,7 +79,6 @@ def id_character(id):
     return jsonify(character.serialize()), 200
 
 
-# GET PLANET
 @app.route('/planets', methods=['GET'])
 def info_planet():
 
@@ -100,8 +86,6 @@ def info_planet():
     response = [planet.serialize() for planet in planet_list]
 
     return jsonify(response), 200
-
-#GET ID PLANET
 
 @app.route('/planets/<int:id>', methods=['GET'])
 def id_planet(id):
@@ -112,7 +96,7 @@ def id_planet(id):
 
     return jsonify(planet.serialize()), 200
 
-#GET FAVORITE [/users/favorites]
+
 @app.route('/users/<int:id>/favorites', methods=['GET'])
 def user_favorite(id):
 
@@ -122,7 +106,7 @@ def user_favorite(id):
 
     return jsonify(favorites_serialize), 200
 
-# POST Planet - User
+
 @app.route('/user/<int:id>/favorite/planet/<int:planet_id>', methods = ['POST'])
 def add_planet(id, planet_id):
 
@@ -137,7 +121,7 @@ def add_planet(id, planet_id):
     except:
         return jsonify ({"Error" : "Error"}), 500
 
-# POST Character - User
+
 @app.route('/user/<int:id>/favorite/character/<int:character_id>', methods = ['POST'])
 def add_character(id, character_id):
 
@@ -152,7 +136,7 @@ def add_character(id, character_id):
     except:
         return jsonify ({"Error" : "Error"}), 500
     
-# DELETE Planet - User
+
 @app.route('/user/<int:id>/favorite/planet/<int:planet_id>', methods = ['DELETE'])
 def remove_planet(id, planet_id):
 
@@ -165,9 +149,8 @@ def remove_planet(id, planet_id):
 
     else:
          return jsonify ({"Error" : "Error"}), 500
-    
 
-# DELETE Character - User
+
 @app.route('/user/<int:id>/favorite/character/<int:character_id>', methods = ['DELETE'])
 def remove_character(id, character_id):
 
@@ -182,7 +165,6 @@ def remove_character(id, character_id):
          return jsonify ({"Error" : "Error"}), 500
 
 
-# this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=False)

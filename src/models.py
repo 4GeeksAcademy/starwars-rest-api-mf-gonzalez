@@ -5,14 +5,13 @@ db = SQLAlchemy()
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), nullable=False)
-    last_name = db.Column(db.String(250), nullable=False)
+    username = db.Column(db.String(120), unique=True, nullable=False)
     email = db.Column(db.String(250), nullable=False)
     password = db.Column(db.String(250), nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
 
-    def __init__ (self, name, last_name, email, password):
-        self.name = name
+    def __init__ (self, username, last_name, email, password):
+        self.username = username
         self.last_name = last_name
         self.email = email
         self.password = password
@@ -34,15 +33,11 @@ class Character(db.Model):
     name = db.Column(db.String(250), nullable=False)
     height = db.Column(db.String(250), nullable=False)
     mass = db.Column(db.Float, nullable=False)
-    unit_heigth = db.Column(db.String(250), nullable=False)
-    unit_mass = db.Column(db.String(250), nullable=False)
 
     def __init__ (self, name, heigth, mass, unit_heigth, unir_mass):
         self.name = name
         self.height = heigth
         self.mass = mass
-        self.unit_heigth = unit_heigth
-        self.unit_mass = unir_mass
 
     def __repr__(self):
         return '<Character %r>' % self.id
@@ -58,16 +53,12 @@ class Planet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False)
     climate = db.Column(db.String(250), nullable=False)
-    population = db.Column(db.Integer, nullable=False)
-    rotation_period = db.Column(db.Integer, nullable=False)
     surface_water= db.Column(db.Integer, nullable=False)
     diameter= db.Column(db.Integer, nullable=False)
 
     def __init__ (self, name, climate, population, rotation_period, surface_water, diameter):
         self.name = name
         self.climate = climate
-        self.population = population
-        self.rotation_period = rotation_period
         self.surface_water = surface_water
         self.diameter = diameter
 
